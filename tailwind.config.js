@@ -17,7 +17,25 @@ module.exports = {
   			md: 'calc(var(--radius) - 2px)',
   			sm: 'calc(var(--radius) - 4px)'
   		},
-  		colors: {},
+  		colors: {
+  			primary: {
+  				DEFAULT: '#7C3AED', // Vibrant purple
+  				foreground: '#FFFFFF',
+  			},
+  			secondary: {
+  				DEFAULT: '#22D3EE', // Cyan
+  				foreground: '#1E293B',
+  			},
+  			accent: {
+  				DEFAULT: '#F471B5', // Pink
+  				foreground: '#FFFFFF',
+  			},
+  			background: '#F8FAFC',
+  			card: {
+  				DEFAULT: '#FFFFFF',
+  				foreground: '#1E293B',
+  			},
+  		},
   		animation: {
   			'gradient-xy': 'gradient-xy 3s ease infinite',
   		},
@@ -32,6 +50,11 @@ module.exports = {
   					'background-position': 'right center'
   				}
   			}
+  		},
+  		boxShadow: {
+  			'xs': '0 1px 2px 0 rgb(0 0 0 / 0.05)',
+  			'sm': '0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1)',
+  			'md': '0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)',
   		}
   	}
   },

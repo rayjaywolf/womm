@@ -23,7 +23,7 @@ const JournalEditorPage = async ({ params }) => {
   const entry = await getEntry(params.id)
 
   return (
-    <div className="h-full w-full">
+    <div className="h-full w-full max-w-[1200px] mx-auto">
       <Editor entry={entry} />
     </div>
   )

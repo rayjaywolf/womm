@@ -51,7 +51,7 @@ const Editor = ({ entry }) => {
   })
 
   return (
-    <div className="h-full p-5 bg-card/40">
+    <div className="h-full p-5 bg-card/80 backdrop-blur-xl border-none shadow-sm rounded-xl">
       <div className="max-w-[1500px] h-full mx-auto space-y-6">
         <div className="grid grid-cols-3 gap-6 h-[calc(100vh-100px)]">
           <Card className="col-span-2 h-full">

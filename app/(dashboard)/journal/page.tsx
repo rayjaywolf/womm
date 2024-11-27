@@ -4,6 +4,7 @@ import { getUserByClerkID } from '@/util/auth'
 import { prisma } from '@/util/db'
 import Link from 'next/link'
 import { analyze } from '@/util/ai'
+import { Card } from "@/components/ui/card"
 
 const getEntries = async () => {
   const user = await getUserByClerkID()
@@ -15,8 +16,8 @@ const getEntries = async () => {
       createdAt: 'desc',
     },
     include: {
-      analysis: true
-    }
+      analysis: true,
+    },
   })
 
   return data
@@ -25,8 +26,8 @@ const getEntries = async () => {
 const JournalPage = async () => {
   const data = await getEntries()
   return (
-    <div className="px-6 py-5 bg-card/40 h-full">
-      <div className="grid grid-cols-3 gap-4">
+    <Card className="p-6 bg-card/80 backdrop-blur-xl border-none shadow-sm">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <NewEntryCard />
         {data.map((entry) => (
           <div key={entry.id}>
@@ -36,7 +37,7 @@ const JournalPage = async () => {
           </div>
         ))}
       </div>
-    </div>
+    </Card>
   )
 }
 

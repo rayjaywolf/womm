@@ -1,6 +1,7 @@
 import { getUserByClerkID } from '@/util/auth'
 import { prisma } from '@/util/db'
 import HistoryChart from '@/components/HistoryChart'
+import { Card } from "@/components/ui/card"
 
 const getData = async () => {
   const user = await getUserByClerkID()
@@ -22,11 +23,11 @@ const History = async () => {
   const { avg, analysis } = await getData()
   
   return (
-    <div className="px-6 py-5">
+    <Card className="p-6 bg-card/80 backdrop-blur-xl border-none shadow-sm">
       <div className="grid gap-4">
         <HistoryChart data={analysis} avg={avg} />
       </div>
-    </div>
+    </Card>
   )
 }
 
