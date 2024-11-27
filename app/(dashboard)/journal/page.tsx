@@ -14,6 +14,9 @@ const getEntries = async () => {
     orderBy: {
       createdAt: 'desc',
     },
+    include: {
+      analysis: true
+    }
   })
 
   return data
@@ -22,8 +25,7 @@ const getEntries = async () => {
 const JournalPage = async () => {
   const data = await getEntries()
   return (
-    <div className="p-10 bg-zinc-400/10 h-full">
-      <h2 className="text-3xl mb-8">Journal</h2>
+    <div className="px-6 py-5 bg-card/40 h-full">
       <div className="grid grid-cols-3 gap-4">
         <NewEntryCard />
         {data.map((entry) => (
