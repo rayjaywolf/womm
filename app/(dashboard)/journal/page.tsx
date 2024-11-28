@@ -5,7 +5,7 @@ import { prisma } from '@/util/db'
 import Link from 'next/link'
 import { analyze } from '@/util/ai'
 import { Card } from '@/components/ui/card'
-import { Toaster } from "@/components/ui/sonner"
+import { Toaster } from '@/components/ui/sonner'
 
 const getEntries = async () => {
   const user = await getUserByClerkID()
