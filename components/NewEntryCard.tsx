@@ -4,6 +4,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import { createNewEntry } from '@/util/api'
 import { useRouter } from 'next/navigation'
 import { PlusCircle } from 'lucide-react'
+import { toast } from "sonner"
 
 const NewEntryCard = () => {
   const router = useRouter()
@@ -11,6 +12,10 @@ const NewEntryCard = () => {
   const handleOnClick = async () => {
     const data = await createNewEntry()
     router.push(`/journal/${data.id}`)
+    toast("New entry created!", {
+      description: "Your journal entry has been created successfully.",
+      duration: 3000,
+    })
   }
 
   return (

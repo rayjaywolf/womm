@@ -23,7 +23,7 @@ const EntryCard = ({ entry }) => {
   const moodColor = entry.analysis?.color || '#94a3b8'
 
   return (
-    <Card className="hover:shadow-lg transition-shadow duration-200 h-[200px] flex flex-col">
+    <Card className="hover:shadow-sm transition-shadow duration-200 h-[200px] flex flex-col shadow-xs">
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
         <div className="font-semibold text-sm text-muted-foreground flex items-center gap-2">
           <span>{date}</span>
