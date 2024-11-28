@@ -6,7 +6,7 @@ import Breadcrumbs from '@/components/breadcrumbs'
 import { Home, BookOpen, LineChart } from 'lucide-react'
 
 const links = [
-  { href: '/', label: 'Home', icon: Home },
+  { href: '/home', label: 'Home', icon: Home },
   { href: '/journal', label: 'Journal', icon: BookOpen },
   { href: '/history', label: 'History', icon: LineChart },
 ]

@@ -57,7 +57,9 @@ const HistoryChart = ({ data, avg }) => {
   return (
     <div className="col-span-4">
       <div className="flex items-center justify-between mb-6">
-        <h2 className="text-lg font-semibold tracking-tight">Sentiment Analysis</h2>
+        <h2 className="text-lg font-semibold tracking-tight">
+          Sentiment Analysis
+        </h2>
         <Badge
           variant={avg > 5 ? 'default' : 'destructive'}
           className="text-xs"

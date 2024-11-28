@@ -20,15 +20,13 @@ const NewEntryCard = () => {
 
   return (
     <Card 
-      className="hover:shadow-md transition-all duration-200 cursor-pointer group h-[200px] border border-dashed relative overflow-hidden"
+      className="group h-[200px] relative overflow-hidden transition-all duration-300 hover:shadow-lg cursor-pointer border border-dashed border-primary/20 bg-card/80 backdrop-blur-sm"
       onClick={handleOnClick}
     >
-      <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 via-transparent to-blue-500/5 group-hover:animate-gradient-xy" />
-      <CardContent className="h-full flex flex-col items-center justify-center relative z-10">
-        <div className="relative">
-          <div className="absolute inset-0 bg-gradient-to-br from-purple-500 to-blue-500 rounded-full blur-lg opacity-10" />
-          <PlusCircle className="h-12 w-12 mb-4 relative z-10 text-primary" />
-        </div>
+      <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 via-transparent to-blue-500/5 opacity-0 group-hover:opacity-100 transition-all duration-300" />
+      
+      <CardContent className="h-full flex flex-col items-center justify-center relative">
+        <PlusCircle className="h-12 w-12 text-primary transition-transform duration-300 group-hover:scale-110" />
         <p className="text-lg font-medium text-primary mt-4">
           New Entry
         </p>

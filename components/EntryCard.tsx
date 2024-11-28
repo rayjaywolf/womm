@@ -1,5 +1,21 @@
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
+import { cn } from '@/lib/utils'
+
+const colorMapping = {
+  '#D3D3D3': '#404040',
+  '#ADD8E6': '#00008B',
+  '#98FB98': '#006400',
+  '#A3D9FF': '#00008B',
+  '#FFB6C1': '#8B0000',
+  '#90EE90': '#006400',
+  '#C0C0C0': '#404040',
+  '#A9A9A9': '#404040',
+  '#FFFF00': '#8B8B00',
+  '#FFC0CB': '#8B0000',
+  '#FFE4E1': '#8B0000',
+  '#F0FFF0': '#006400',
+}
 
 const EntryCard = ({ entry }) => {
   const dateObj = new Date(entry.createdAt)
@@ -21,35 +37,71 @@ const EntryCard = ({ entry }) => {
       entry.analysis.summary.slice(1)
     : 'No summary yet...'
   const moodColor = entry.analysis?.color || '#94a3b8'
+  const darkVariant = colorMapping[moodColor]
+  const needsDarkVariant = colorMapping.hasOwnProperty(moodColor)
 
   return (
-    <Card className="hover:shadow-sm transition-shadow duration-200 h-[200px] flex flex-col shadow-xs">
-      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-        <div className="font-semibold text-sm text-muted-foreground flex items-center gap-2">
-          <span>{date}</span>
-          <span className="text-xs opacity-50">{time}</span>
-        </div>
+    <Card className="group h-[200px] relative overflow-hidden transition-all duration-300 hover:shadow-lg bg-card/80 backdrop-blur-sm border-none">
+      <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-all duration-500">
         <div
-          className="w-3 h-3 rounded-full"
-          style={{ backgroundColor: moodColor }}
+          className="absolute inset-0"
+          style={{
+            background: `radial-gradient(circle at top right, ${moodColor}10, transparent)`,
+          }}
         />
+        <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-primary/20 to-transparent" />
+      </div>
+
+      <CardHeader className="flex flex-row items-start justify-between space-y-0 pb-2">
+        <div className="space-y-1.5">
+          <div className="flex items-center gap-2">
+            <div
+              className="w-2 h-2 rounded-full transition-transform duration-300 group-hover:scale-110"
+              style={{ backgroundColor: moodColor }}
+            />
+            <span className="font-medium text-sm">{date}</span>
+          </div>
+          <span className="text-xs text-muted-foreground/60 pl-4">{time}</span>
+        </div>
       </CardHeader>
-      <CardContent className="flex-1">
-        <p className="text-sm text-muted-foreground line-clamp-2">{summary}</p>
+
+      <CardContent>
+        <div className="relative">
+          <div
+            className="absolute left-0 top-1/2 -translate-y-1/2 w-[2px] h-0 group-hover:h-full transition-all duration-500"
+            style={{ backgroundColor: `${moodColor}30` }}
+          />
+          <p className="text-xs text-muted-foreground/80 line-clamp-3 pl-4">
+            {summary}
+          </p>
+        </div>
       </CardContent>
-      <CardFooter>
+
+      <CardFooter className="absolute bottom-0 left-0 w-full pb-4 px-6">
         <Badge
           variant="secondary"
           style={{
             backgroundColor: `${moodColor}20`,
-            color: moodColor,
-            borderColor: `${moodColor}50`,
+            color: needsDarkVariant ? darkVariant : moodColor,
+            borderColor: needsDarkVariant
+              ? `${darkVariant}50`
+              : `${moodColor}50`,
           }}
-          className="font-medium"
+          className={cn(
+            'font-medium transition-all duration-300 group-hover:translate-x-2',
+            needsDarkVariant ? `${darkVariant}50` : `${moodColor}50`,
+          )}
         >
           {mood}
         </Badge>
       </CardFooter>
+
+      <div
+        className="absolute bottom-0 left-0 w-full h-[1px] opacity-0 group-hover:opacity-100 transition-all duration-500"
+        style={{
+          background: `linear-gradient(to right, transparent, ${moodColor}40, transparent)`,
+        }}
+      />
     </Card>
   )
 }
