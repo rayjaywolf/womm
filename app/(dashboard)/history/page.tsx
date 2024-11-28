@@ -1,6 +1,7 @@
 import { getUserByClerkID } from '@/util/auth'
 import { prisma } from '@/util/db'
 import HistoryChart from '@/components/HistoryChart'
+import MoodPieChart from '@/components/MoodPieChart'
 import { Card } from "@/components/ui/card"
 
 const getData = async () => {
@@ -12,6 +13,12 @@ const getData = async () => {
     orderBy: {
       updatedAt: 'desc',
     },
+    select: {
+      sentimentScore: true,
+      mood: true,
+      updatedAt: true,
+      color: true
+    }
   })
 
   const sum = analysis.reduce((all, current) => all + current.sentimentScore, 0)
@@ -21,11 +28,14 @@ const getData = async () => {
 
 const History = async () => {
   const { avg, analysis } = await getData()
-  
+
   return (
-    <Card className="p-6 bg-card/80 backdrop-blur-xl border-none shadow-sm">
-      <div className="grid gap-4">
-        <HistoryChart data={analysis} avg={avg} />
+    <Card className="p-6 bg-card/80 backdrop-blur-xl border-none shadow-sm h-[calc(100vh-108px)]">
+      <div className="h-full overflow-y-auto pr-2 -mr-2 scrollbar-thin scrollbar-thumb-secondary scrollbar-track-transparent">
+        <div className="grid gap-12">
+          <HistoryChart data={analysis} avg={avg} />
+          <MoodPieChart data={analysis} />
+        </div>
       </div>
     </Card>
   )

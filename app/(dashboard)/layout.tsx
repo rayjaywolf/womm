@@ -1,5 +1,8 @@
+'use client'
+
 import { UserButton } from '@clerk/nextjs'
 import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 import { Separator } from '@/components/ui/separator'
 import { Card } from '@/components/ui/card'
 import Breadcrumbs from '@/components/breadcrumbs'
@@ -12,6 +15,8 @@ const links = [
 ]
 
 const DashboardLayout = ({ children }) => {
+  const pathname = usePathname()
+
   return (
     <div className="min-h-screen w-full relative bg-gradient-to-br from-background to-secondary/5 overflow-hidden">
       <Card className="fixed w-[240px] top-4 bottom-4 left-4 rounded-xl border-none shadow-sm bg-card/80 backdrop-blur-xl">
@@ -26,17 +31,24 @@ const DashboardLayout = ({ children }) => {
 
           <nav className="flex-1 px-3 py-4">
             <ul className="space-y-1">
-              {links.map((link) => (
-                <li key={link.href}>
-                  <Link
-                    href={link.href}
-                    className="flex items-center gap-3 px-4 py-3 text-sm rounded-lg hover:bg-primary/10 hover:text-primary transition-colors"
-                  >
-                    <link.icon className="w-4 h-4" />
-                    {link.label}
-                  </Link>
-                </li>
-              ))}
+              {links.map((link) => {
+                const isActive = pathname.startsWith(link.href)
+                return (
+                  <li key={link.href}>
+                    <Link
+                      href={link.href}
+                      className={`flex items-center gap-3 px-4 py-3 text-sm rounded-lg transition-colors ${
+                        isActive
+                          ? 'bg-primary/10 text-primary'
+                          : 'hover:bg-primary/10 hover:text-primary'
+                      }`}
+                    >
+                      <link.icon className="w-4 h-4" />
+                      {link.label}
+                    </Link>
+                  </li>
+                )
+              })}
             </ul>
           </nav>
         </div>

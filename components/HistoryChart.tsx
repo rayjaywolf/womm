@@ -61,25 +61,32 @@ const HistoryChart = ({ data, avg }) => {
           Sentiment Analysis
         </h2>
         <Badge
-          variant={avg > 5 ? 'default' : 'destructive'}
+          variant={avg > 0 ? 'default' : 'destructive'}
           className="text-xs"
         >
-          Average: {avg}/10
+          Average: {avg.toFixed(1)}/10
         </Badge>
       </div>
       <div className="h-[400px] w-full">
         <ResponsiveContainer width="100%" height="100%">
-          <LineChart data={data}>
+          <LineChart
+            data={data}
+          >
             <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
             <XAxis
               dataKey="updatedAt"
-              tickFormatter={(value) => new Date(value).toLocaleDateString()}
+              tickFormatter={(value) => new Date(value).toLocaleDateString('en-us', {
+                month: 'short',
+                day: 'numeric'
+              })}
               className="text-sm text-muted-foreground"
+              dy={15}
             />
             <YAxis
-              domain={[0, 10]}
+              domain={[-10, 10]}
               tickFormatter={(value) => `${value}`}
               className="text-sm text-muted-foreground"
+              dx={-15}
             />
             <Tooltip
               content={<CustomTooltip />}

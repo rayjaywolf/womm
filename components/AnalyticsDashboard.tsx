@@ -76,10 +76,12 @@ const AnalyticsDashboard = ({ entries }) => {
                 <XAxis
                   dataKey="date"
                   className="text-xs text-muted-foreground"
+                  dy={15}
                 />
                 <YAxis
-                  domain={[0, 10]}
+                  domain={[-10, 10]}
                   className="text-xs text-muted-foreground"
+                  dx={-15}
                 />
                 <Tooltip content={<CustomTooltip />} />
                 <Line
