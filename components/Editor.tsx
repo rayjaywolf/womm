@@ -1,13 +1,28 @@
 'use client'
 
-import { updateEntry } from '@/util/api'
-import { useState } from 'react'
+import { updateEntry, deleteEntry } from '@/util/api'
+import { useState, useEffect } from 'react'
 import { useAutosave } from 'react-autosave'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
 import { cn } from '@/lib/utils'
-import { CalendarDays, Save } from 'lucide-react'
+import { CalendarDays, Save, Trash2 } from 'lucide-react'
 import { Textarea } from './ui/textarea'
+import { useRouter } from 'next/navigation'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
+import { toast } from "sonner"
+import { Checkbox } from "@/components/ui/checkbox"
+import { Button } from "@/components/ui/button"
 
 const getLuminance = (color: string) => {
   const hex = color.replace('#', '')
@@ -27,9 +42,12 @@ const getMoodEmoji = (score: number) => {
 }
 
 const Editor = ({ entry }) => {
+  const router = useRouter()
   const [value, setValue] = useState(entry.content)
   const [isLoading, setIsLoading] = useState(false)
   const [analysis, setAnalysis] = useState(entry.analysis)
+  const [autoSave, setAutoSave] = useState(true)
+  const [initialContent] = useState(entry.content)
   const date = new Date(entry.createdAt).toLocaleString('en-US', {
     weekday: 'long',
     year: 'numeric',
@@ -57,12 +75,50 @@ const Editor = ({ entry }) => {
     { name: 'Negative', value: negative ? 'Yes' : 'No', icon: '🎯' },
   ]
 
+  const handleDelete = async () => {
+    toast.promise(
+      async () => {
+        await deleteEntry(entry.id)
+        router.push('/journal')
+      },
+      {
+        loading: 'Deleting...',
+        success: 'Journal entry deleted successfully',
+        error: 'Failed to delete entry',
+      }
+    )
+  }
+
+  const handleManualSave = async () => {
+    const loadingToast = toast.loading("Saving changes...")
+    setIsLoading(true)
+    try {
+      const data = await updateEntry(entry.id, value)
+      setAnalysis(data.data.analysis)
+      toast.dismiss(loadingToast)
+      toast.success("Changes saved successfully")
+    } catch (error) {
+      toast.dismiss(loadingToast)
+      toast.error("Failed to save changes")
+    }
+    setIsLoading(false)
+  }
+
   useAutosave({
     data: value,
     onSave: async (_value) => {
+      if (!autoSave || _value === initialContent) return
       setIsLoading(true)
-      const data = await updateEntry(entry.id, _value)
-      setAnalysis(data.data.analysis)
+      const loadingToast = toast.loading("Saving changes...")
+      try {
+        const data = await updateEntry(entry.id, _value)
+        setAnalysis(data.data.analysis)
+        toast.dismiss(loadingToast)
+        toast.success("Changes saved successfully")
+      } catch (error) {
+        toast.dismiss(loadingToast)
+        toast.error("Failed to save changes")
+      }
       setIsLoading(false)
     },
   })
@@ -70,19 +126,59 @@ const Editor = ({ entry }) => {
   return (
     <div className="grid grid-cols-3 gap-6 h-[calc(100vh-108px)]">
       <Card className="col-span-2 flex flex-col overflow-hidden shadow-sm border-none">
-        <CardHeader className="flex-none border-b px-6 py-4">
+        <CardHeader className="flex-none border-b px-6 py-4 h-[60px]">
           <div className="flex items-center justify-between">
             <CardTitle>Journal Entry</CardTitle>
             <div className="flex items-center gap-6">
-              {isLoading && (
-                <div className="flex items-center space-x-2 text-muted-foreground">
-                  <Save className="h-4 w-4 animate-spin" />
-                  <span className="text-sm">Saving...</span>
-                </div>
-              )}
               <div className="flex items-center space-x-2 text-muted-foreground">
                 <CalendarDays className="h-4 w-4" />
                 <span className="text-sm">{date}</span>
+              </div>
+              <div className="flex items-center gap-6">
+                <div className="flex items-center space-x-2">
+                  <Checkbox
+                    id="autosave"
+                    checked={autoSave}
+                    onCheckedChange={setAutoSave}
+                  />
+                  <label
+                    htmlFor="autosave"
+                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                  >
+                    Autosave
+                  </label>
+                </div>
+                <Button
+                  size="sm"
+                  onClick={handleManualSave}
+                  disabled={isLoading || autoSave}
+                >
+                  Save
+                </Button>
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <button className="flex items-center space-x-2 text-muted-foreground hover:text-destructive transition-colors">
+                      <Trash2 className="h-5 w-5" style={{ color: '#AB231D' }} />
+                    </button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        This action cannot be undone. This will permanently delete your journal entry.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Cancel</AlertDialogCancel>
+                      <AlertDialogAction
+                        onClick={handleDelete}
+                        variant="destructive"
+                      >
+                        Delete
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
               </div>
             </div>
           </div>

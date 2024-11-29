@@ -15,6 +15,7 @@ const colorMapping = {
   '#FFC0CB': '#8B0000',
   '#FFE4E1': '#8B0000',
   '#F0FFF0': '#006400',
+  '#FFD602': '#8B8B00',
 }
 
 const EntryCard = ({ entry }) => {

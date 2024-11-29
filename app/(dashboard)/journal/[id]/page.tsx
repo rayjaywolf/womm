@@ -1,6 +1,7 @@
 import Editor from '@/components/Editor'
 import { getUserByClerkID } from '@/util/auth'
 import { prisma } from '@/util/db'
+import { Toaster } from "@/components/ui/sonner"
 
 const getEntry = async (id) => {
   const user = await getUserByClerkID()
@@ -23,9 +24,12 @@ const JournalEditorPage = async ({ params }) => {
   const entry = await getEntry(params.id)
 
   return (
-    <div className="h-full w-full max-w-[1200px] mx-auto">
-      <Editor entry={entry} />
-    </div>
+    <>
+      <div className="h-full w-full max-w-[1200px] mx-auto">
+        <Editor entry={entry} />
+      </div>
+      <Toaster position="bottom-right" />
+    </>
   )
 }
 

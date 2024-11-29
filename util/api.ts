@@ -23,3 +23,10 @@ export const createNewEntry = async () => {
         return data.data
     }
 }
+
+export const deleteEntry = async (id: string) => {
+    const res = await fetch(`/api/journal/${id}`, {
+        method: 'DELETE',
+    })
+    return res.json()
+}

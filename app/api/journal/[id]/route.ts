@@ -35,3 +35,19 @@ export const PATCH = async (request: Request, { params }) => {
 
   return NextResponse.json({ data: { ...updateEntry, analysis: updated } })
 }
+
+export const DELETE = async (request: Request, { params }) => {
+  const user = await getUserByClerkID()
+
+  const deletedEntry = await prisma.journalEntry.delete({
+    where: {
+      userId_id: {
+        userId: user.id,
+        id: params.id,
+      },
+    },
+  })
+
+  revalidatePath('/journal')
+  return NextResponse.json({ data: deletedEntry })
+}
