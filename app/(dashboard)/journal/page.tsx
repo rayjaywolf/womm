@@ -60,7 +60,6 @@ const JournalPage = async ({ searchParams }: PageProps) => {
         <div className="h-full overflow-y-auto pr-2 -mr-2 scrollbar-thin scrollbar-thumb-secondary scrollbar-track-transparent">
           <JournalFilters filter={filter} sort={sort} />
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-1">
-            <NewEntryCard />
             {data.map((entry) => (
               <div key={entry.id} className="relative">
                 <Link href={`/journal/${entry.id}`}>

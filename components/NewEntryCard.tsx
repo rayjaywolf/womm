@@ -1,15 +1,32 @@
 'use client'
 
-import { Card, CardContent } from '@/components/ui/card'
+import { Button } from "@/components/ui/button"
+import {
+  ToggleGroup,
+  ToggleGroupItem,
+} from "@/components/ui/toggle-group"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
+import { useRouter, useSearchParams } from 'next/navigation'
+import { PenLine, Plus } from 'lucide-react'
 import { createNewEntry } from '@/util/api'
-import { useRouter } from 'next/navigation'
-import { PlusCircle } from 'lucide-react'
 import { toast } from "sonner"
 
-const NewEntryCard = () => {
-  const router = useRouter()
+interface JournalFiltersProps {
+  filter: string
+  sort: string
+}
 
-  const handleOnClick = async () => {
+const JournalFilters = ({ filter, sort }: JournalFiltersProps) => {
+  const router = useRouter()
+  const searchParams = useSearchParams()
+
+  const handleNewEntry = async () => {
     const data = await createNewEntry()
     router.push(`/journal/${data.id}`)
     toast("New entry created!", {
@@ -18,21 +35,58 @@ const NewEntryCard = () => {
     })
   }
 
+  // Filter and Sort handlers remain the same...
+
   return (
-    <Card 
-      className="group h-[200px] relative overflow-hidden transition-all duration-300 hover:shadow-lg cursor-pointer border border-dashed border-primary/20 bg-card/80 backdrop-blur-sm"
-      onClick={handleOnClick}
-    >
-      <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 via-transparent to-blue-500/5 opacity-0 group-hover:opacity-100 transition-all duration-300" />
-      
-      <CardContent className="h-full flex flex-col items-center justify-center relative">
-        <PlusCircle className="h-12 w-12 text-primary transition-transform duration-300 group-hover:scale-110" />
-        <p className="text-lg font-medium text-primary mt-4">
-          New Entry
-        </p>
-      </CardContent>
-    </Card>
+    <div className="flex items-center justify-between gap-4 mb-5">
+      <Button
+        onClick={handleNewEntry}
+        variant="outline"
+        className="relative group border border-primary/20 hover:border-primary/30 bg-background/50 hover:bg-background/80 backdrop-blur-sm"
+      >
+        <div className="absolute inset-0 transition-all duration-300 group-hover:bg-primary/5 rounded-md" />
+        <Plus className="w-4 h-4 mr-2 transition-all duration-300 group-hover:rotate-90 text-primary/60 group-hover:text-primary" />
+        <span className="text-primary/80 group-hover:text-primary transition-colors duration-300">New Entry</span>
+      </Button>
+
+      <div className="flex items-center gap-4">
+        <ToggleGroup
+          type="single"
+          value={filter}
+          onValueChange={(value) => {
+            if (value) setFilter(value)
+          }}
+          className="font-sm"
+        >
+          <ToggleGroupItem value="all" aria-label="All entries" className="font-sm">
+            All
+          </ToggleGroupItem>
+          <ToggleGroupItem value="today" aria-label="Today's entries" className="font-sm">
+            Today
+          </ToggleGroupItem>
+          <ToggleGroupItem value="week" aria-label="Past week entries" className="font-sm">
+            Past Week
+          </ToggleGroupItem>
+          <ToggleGroupItem value="month" aria-label="Past month entries" className="font-sm">
+            Past Month
+          </ToggleGroupItem>
+        </ToggleGroup>
+
+        <Select
+          value={sort}
+          onValueChange={setSort}
+        >
+          <SelectTrigger className="w-[130px] focus:ring-0 focus:ring-offset-0">
+            <SelectValue placeholder="Sort by" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="latest">Latest</SelectItem>
+            <SelectItem value="oldest">Oldest</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+    </div>
   )
 }
 
-export default NewEntryCard
+export default JournalFilters
