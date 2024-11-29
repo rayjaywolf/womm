@@ -8,17 +8,25 @@ export const POST = async () => {
     const user = await getUserByClerkID()
     const entry = await prisma.journalEntry.create({
         data: {
-           userId: user.id,
-           content: "Write about your day"
+            userId: user.id,
+            content: ""
         }
     })
 
-    const analysis = await analyze(entry.content)
+    const defaultAnalysis = {
+        mood: "no mood",
+        subject: "no subject",
+        summary: "no summary",
+        negative: false,
+        color: "#A9A9A9",
+        sentimentScore: 0
+    }
+
     await prisma.analysis.create({
         data: {
             userId: user.id,
             entryId: entry.id,
-            ...analysis
+            ...defaultAnalysis
         }
     })
 

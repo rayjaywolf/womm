@@ -37,11 +37,10 @@ const DashboardLayout = ({ children }) => {
                   <li key={link.href}>
                     <Link
                       href={link.href}
-                      className={`flex items-center gap-3 px-4 py-3 text-sm rounded-lg transition-colors ${
-                        isActive
-                          ? 'bg-primary/10 text-primary'
-                          : 'hover:bg-primary/10 hover:text-primary'
-                      }`}
+                      className={`flex items-center gap-3 px-4 py-3 text-sm rounded-lg transition-colors ${isActive
+                        ? 'bg-primary/10 text-primary'
+                        : 'hover:bg-primary/10 hover:text-primary'
+                        }`}
                     >
                       <link.icon className="w-4 h-4" />
                       {link.label}

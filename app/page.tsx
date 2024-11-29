@@ -4,7 +4,7 @@ import Link from 'next/link'
 export default async function Home() {
   const { userId } = await auth()
 
-  let href = userId ? '/journal' : '/sign-in'
+  let href = userId ? '/journal' : '/sign-up'
 
   return (
     <div className="w-screen h-screen bg-black flex flex-col justify-center items-center text-white">

@@ -1,7 +1,7 @@
 'use client'
 
 import { updateEntry, deleteEntry } from '@/util/api'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useAutosave } from 'react-autosave'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -48,12 +48,19 @@ const Editor = ({ entry }) => {
   const [analysis, setAnalysis] = useState(entry.analysis)
   const [autoSave, setAutoSave] = useState(true)
   const [initialContent] = useState(entry.content)
+  const textareaRef = useRef(null)
   const date = new Date(entry.createdAt).toLocaleString('en-US', {
     weekday: 'long',
     year: 'numeric',
     month: 'long',
     day: 'numeric',
   })
+
+  useEffect(() => {
+    if (textareaRef.current && value) {
+      textareaRef.current.setSelectionRange(value.length, value.length)
+    }
+  }, [])
 
   const { mood, subject, summary, negative, color, sentimentScore } = analysis
   const analysisData = [
@@ -185,17 +192,12 @@ const Editor = ({ entry }) => {
         </CardHeader>
         <CardContent className="flex-1 p-0 overflow-hidden">
           <Textarea
+            ref={textareaRef}
             value={value}
             onChange={(e) => setValue(e.target.value)}
             className="h-full rounded-none border-0 resize-none focus-visible:ring-0 focus-visible:ring-offset-0 px-5"
             placeholder="Write your thoughts here..."
-            ref={(textarea) => {
-              if (textarea) {
-                textarea.selectionStart = textarea.value.length
-                textarea.selectionEnd = textarea.value.length
-                textarea.focus()
-              }
-            }}
+            autoFocus
           />
         </CardContent>
       </Card>

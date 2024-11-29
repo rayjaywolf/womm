@@ -19,7 +19,18 @@ export const PATCH = async (request: Request, { params }) => {
     },
   })
 
-  const analysis = await analyze(updateEntry.content)
+  let analysis = {
+    mood: "no mood",
+    subject: "no subject",
+    summary: "no summary",
+    negative: false,
+    color: "#A9A9A9",
+    sentimentScore: 0
+  }
+
+  if (content.trim()) {
+    analysis = await analyze(updateEntry.content)
+  }
 
   const updated = await prisma.analysis.upsert({
     where: {

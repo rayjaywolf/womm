@@ -1,14 +1,23 @@
 import { auth } from '@clerk/nextjs'
 import { prisma } from './db'
+import { redirect } from 'next/navigation'
 
 export const getUserByClerkID = async () => {
-  const { userId } = await auth();
+  const { userId } = await auth()
 
-  const user = await prisma.user.findUniqueOrThrow({
-	where: {
-	  clerkId: userId,
-	},
-  });
+  if (!userId) {
+    redirect('/sign-up')
+  }
 
-  return user;
+  const user = await prisma.user.findUnique({
+    where: {
+      clerkId: userId,
+    },
+  })
+
+  if (!user) {
+    redirect('/new-user')
+  }
+
+  return user
 }
