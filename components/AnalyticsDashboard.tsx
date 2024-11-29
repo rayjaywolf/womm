@@ -33,28 +33,28 @@ const AnalyticsDashboard = ({ entries }) => {
     }, {})
   ).sort((a, b) => b[1] - a[1])[0]
 
-  const averageWordsPerEntry = entries.reduce((acc, entry) => 
+  const averageWordsPerEntry = entries.reduce((acc, entry) =>
     acc + (entry.content?.split(/\s+/).length || 0), 0) / totalEntries
 
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <StatCard 
+        <StatCard
           title="Total Entries"
           value={totalEntries}
           icon="📝"
         />
-        <StatCard 
+        <StatCard
           title="Average Sentiment"
           value={`${averageSentiment.toFixed(1)}/10`}
           icon={getMoodEmoji(averageSentiment)}
         />
-        <StatCard 
+        <StatCard
           title="Most Common Mood"
           value={mostCommonMood?.[0] || 'N/A'}
           icon="🎯"
         />
-        <StatCard 
+        <StatCard
           title="Avg. Words per Entry"
           value={Math.round(averageWordsPerEntry)}
           icon="📊"

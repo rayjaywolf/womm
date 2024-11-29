@@ -35,14 +35,14 @@ const EntryCard = ({ entry }) => {
   const mood = entry.analysis?.mood.toUpperCase() || 'NO MOOD'
   const summary = entry.analysis?.summary
     ? entry.analysis.summary.charAt(0).toUpperCase() +
-      entry.analysis.summary.slice(1)
+    entry.analysis.summary.slice(1)
     : 'No summary yet...'
   const moodColor = entry.analysis?.color || '#94a3b8'
   const darkVariant = colorMapping[moodColor]
   const needsDarkVariant = colorMapping.hasOwnProperty(moodColor)
 
   return (
-    <Card className="group h-[200px] relative overflow-hidden transition-all duration-300 hover:shadow-lg bg-card/80 backdrop-blur-sm border-none">
+    <Card className="group h-[200px] relative overflow-hidden transition-all duration-300 shadow-none hover: bg-card/80 backdrop-blur-sm">
       <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-all duration-500">
         <div
           className="absolute inset-0"
@@ -89,7 +89,7 @@ const EntryCard = ({ entry }) => {
               : `${moodColor}50`,
           }}
           className={cn(
-            'font-medium transition-all duration-300 group-hover:translate-x-2',
+            'font-medium transition-all duration-300',
             needsDarkVariant ? `${darkVariant}50` : `${moodColor}50`,
           )}
         >

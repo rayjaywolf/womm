@@ -9,6 +9,15 @@ import {
   Legend,
   Tooltip,
 } from 'recharts'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
+import { useState, useMemo } from 'react'
+import { startOfToday, subDays, subMonths, startOfDay } from 'date-fns'
 
 const moodCategories = {
   happiness: {
@@ -209,6 +218,29 @@ const CustomLegend = ({ payload }) => {
 }
 
 const MoodPieChart = ({ data }) => {
+  const [timeFilter, setTimeFilter] = useState('all')
+
+  const filteredData = useMemo(() => {
+    if (timeFilter === 'all') return data
+
+    let date = new Date()
+    switch (timeFilter) {
+      case 'today':
+        date = startOfToday()
+        break
+      case 'week':
+        date = subDays(new Date(), 7)
+        break
+      case 'month':
+        date = subMonths(new Date(), 1)
+        break
+      default:
+        return data
+    }
+
+    return data.filter(entry => new Date(entry.updatedAt) >= startOfDay(date))
+  }, [data, timeFilter])
+
   const getMoodCategory = (mood) => {
     for (const [category, info] of Object.entries(moodCategories)) {
       if (info.moods.includes(mood)) {
@@ -218,7 +250,7 @@ const MoodPieChart = ({ data }) => {
     return 'unknown'
   }
 
-  const categoryData = data.reduce((acc, entry) => {
+  const categoryData = filteredData.reduce((acc, entry) => {
     const category = getMoodCategory(entry.mood)
     acc[category] = (acc[category] || 0) + 1
     return acc
@@ -240,10 +272,24 @@ const MoodPieChart = ({ data }) => {
 
   return (
     <div className="col-span-4">
-      <div>
-        <h2 className="text-lg font-semibold tracking-tight mb-2">
+      <div className="flex items-center justify-between mb-6">
+        <h2 className="text-lg font-semibold tracking-tight">
           Mood Categories Distribution
         </h2>
+        <Select
+          value={timeFilter}
+          onValueChange={setTimeFilter}
+        >
+          <SelectTrigger className="w-[130px] focus:ring-0 focus:ring-offset-0">
+            <SelectValue placeholder="Time range" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Time</SelectItem>
+            <SelectItem value="today">Today</SelectItem>
+            <SelectItem value="week">Past Week</SelectItem>
+            <SelectItem value="month">Past Month</SelectItem>
+          </SelectContent>
+        </Select>
       </div>
       <div className="h-[400px] w-full">
         <ResponsiveContainer width="100%" height="100%">

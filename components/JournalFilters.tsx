@@ -67,7 +67,7 @@ const JournalFilters = ({ filter, sort }: JournalFiltersProps) => {
                 <span className="text-primary group-hover:text-primary transition-colors duration-300">New Entry</span>
             </Button>
 
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-5">
                 <ToggleGroup
                     type="single"
                     value={filter}
@@ -89,7 +89,6 @@ const JournalFilters = ({ filter, sort }: JournalFiltersProps) => {
                         Past Month
                     </ToggleGroupItem>
                 </ToggleGroup>
-
                 <Select
                     value={sort}
                     onValueChange={setSort}
