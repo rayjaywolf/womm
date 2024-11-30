@@ -4,10 +4,12 @@ import { prisma } from "@/util/db"
 import { revalidatePath } from "next/cache"
 import { NextResponse } from "next/server"
 
-export const POST = async () => {
+export const POST = async (request: Request) => {
+    const { id } = await request.json()
     const user = await getUserByClerkID()
     const entry = await prisma.journalEntry.create({
         data: {
+            id,
             userId: user.id,
             content: ""
         }
