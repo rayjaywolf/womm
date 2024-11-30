@@ -1,44 +1,58 @@
 import { getUserByClerkID } from '@/util/auth'
 import { prisma } from '@/util/db'
-import HistoryChart from '@/components/HistoryChart'
-import MoodPieChart from '@/components/MoodPieChart'
-import { Card } from "@/components/ui/card"
+import YearlyMoodCalendar from '@/components/YearlyMoodCalendar'
 
 const getData = async () => {
   const user = await getUserByClerkID()
-  const analysis = await prisma.analysis.findMany({
+
+  const entries = await prisma.journalEntry.findMany({
     where: {
       userId: user.id,
     },
-    orderBy: {
-      updatedAt: 'desc',
+    include: {
+      analysis: true,
     },
-    select: {
-      sentimentScore: true,
-      mood: true,
-      updatedAt: true,
-      color: true
-    }
+    orderBy: {
+      createdAt: 'asc',
+    },
   })
 
-  const sum = analysis.reduce((all, current) => all + current.sentimentScore, 0)
-  const avg = Math.round(sum / analysis.length)
-  return { analysis, avg }
+  // Group entries by date and calculate average sentiment
+  const entriesByDate = entries.reduce((acc, entry) => {
+    const date = new Date(entry.createdAt)
+    date.setHours(0, 0, 0, 0)
+    const dateString = date.toISOString()
+
+    if (!acc[dateString]) {
+      acc[dateString] = {
+        date,
+        sentimentSum: 0,
+        entriesCount: 0,
+      }
+    }
+
+    if (entry.analysis?.sentimentScore) {
+      acc[dateString].sentimentSum += entry.analysis.sentimentScore
+      acc[dateString].entriesCount += 1
+    }
+
+    return acc
+  }, {})
+
+  // Calculate averages and format data
+  const calendarData = Object.values(entriesByDate).map(({ date, sentimentSum, entriesCount }) => ({
+    date,
+    averageSentiment: entriesCount > 0 ? sentimentSum / entriesCount : 0,
+    entriesCount,
+  }))
+
+  return calendarData
 }
 
-const History = async () => {
-  const { avg, analysis } = await getData()
+const HistoryPage = async () => {
+  const data = await getData()
 
-  return (
-    <Card className="p-6 bg-card/80 backdrop-blur-xl border-none shadow-sm h-[calc(100vh-108px)]">
-      <div className="h-full overflow-y-auto pr-2 -mr-2 scrollbar-thin scrollbar-thumb-secondary scrollbar-track-transparent">
-        <div className="grid gap-12">
-          <HistoryChart data={analysis} avg={avg} />
-          <MoodPieChart data={analysis} />
-        </div>
-      </div>
-    </Card>
-  )
+  return <YearlyMoodCalendar data={data} />
 }
 
-export default History
+export default HistoryPage

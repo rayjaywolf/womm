@@ -8,6 +8,13 @@ import {
   ResponsiveContainer,
   Legend,
   Tooltip,
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  AreaChart,
+  Area,
 } from 'recharts'
 import {
   Select,
@@ -17,7 +24,8 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { useState, useMemo } from 'react'
-import { startOfToday, subDays, subMonths, startOfDay } from 'date-fns'
+import { startOfToday, subDays, subMonths, startOfDay, endOfDay, eachDayOfInterval } from 'date-fns'
+import { format } from 'date-fns'
 
 const moodCategories = {
   happiness: {
@@ -270,9 +278,53 @@ const MoodPieChart = ({ data }) => {
       total,
     }))
 
+  // Enhanced time series data processing
+  const timeSeriesData = useMemo(() => {
+    if (!filteredData.length) return []
+
+    const dateRange = {
+      start: startOfDay(new Date(Math.min(...filteredData.map(d => new Date(d.updatedAt))))),
+      end: endOfDay(new Date(Math.max(...filteredData.map(d => new Date(d.updatedAt)))))
+    }
+
+    const dates = eachDayOfInterval(dateRange)
+
+    return dates.map(date => {
+      const dayEntries = filteredData.filter(entry =>
+        startOfDay(new Date(entry.updatedAt)).getTime() === startOfDay(date).getTime()
+      )
+
+      // Calculate average sentiment score for each category
+      const categoryScores = Object.keys(moodCategories).reduce((acc, category) => {
+        const categoryEntries = dayEntries.filter(entry =>
+          getMoodCategory(entry.mood) === category
+        )
+
+        // Calculate average sentiment score for this category
+        const avgScore = categoryEntries.length
+          ? categoryEntries.reduce((sum, entry) => sum + entry.sentimentScore, 0) / categoryEntries.length
+          : 0
+
+        acc[`${category}Score`] = avgScore
+        // Also store the count for reference
+        acc[`${category}Count`] = categoryEntries.length
+        return acc
+      }, {})
+
+      return {
+        date: format(date, 'MMM dd'),
+        totalEntries: dayEntries.length,
+        avgDayScore: dayEntries.length
+          ? dayEntries.reduce((sum, entry) => sum + entry.sentimentScore, 0) / dayEntries.length
+          : 0,
+        ...categoryScores,
+      }
+    })
+  }, [filteredData])
+
   return (
     <div className="col-span-4">
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex items-center justify-between mb-8">
         <h2 className="text-lg font-semibold tracking-tight">
           Mood Categories Distribution
         </h2>
@@ -291,33 +343,139 @@ const MoodPieChart = ({ data }) => {
           </SelectContent>
         </Select>
       </div>
-      <div className="h-[400px] w-full">
-        <ResponsiveContainer width="100%" height="100%">
-          <PieChart>
-            <Pie
-              data={chartData}
-              dataKey="value"
-              nameKey="name"
-              cx="50%"
-              cy="45%"
-              innerRadius={80}
-              outerRadius={150}
-              paddingAngle={2}
-              label={renderCustomizedLabel}
-              labelLine={false}
-            >
-              {chartData.map((entry, index) => (
-                <Cell
-                  key={`cell-${index}`}
-                  fill={entry.color}
-                  className="stroke-background stroke-2"
+      <div className="grid gap-6">
+        <div className="grid grid-cols-5 gap-6">
+          <div className="h-[400px] w-full col-span-2">
+            <ResponsiveContainer width="100%" height="100%">
+              <PieChart>
+                <Pie
+                  data={chartData}
+                  dataKey="value"
+                  nameKey="name"
+                  cx="50%"
+                  cy="45%"
+                  innerRadius={80}
+                  outerRadius={150}
+                  paddingAngle={2}
+                  label={renderCustomizedLabel}
+                  labelLine={false}
+                >
+                  {chartData.map((entry, index) => (
+                    <Cell
+                      key={`cell-${index}`}
+                      fill={entry.color}
+                      className="stroke-background stroke-2"
+                    />
+                  ))}
+                </Pie>
+                <Tooltip content={<CustomTooltip />} />
+                <Legend content={<CustomLegend />} />
+              </PieChart>
+            </ResponsiveContainer>
+          </div>
+
+          <div className="h-[400px] w-full col-span-3">
+            <ResponsiveContainer width="100%" height="100%">
+              <AreaChart
+                data={timeSeriesData}
+                margin={{ top: 20, right: 30, left: 0, bottom: 20 }}
+              >
+                <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
+                <XAxis
+                  dataKey="date"
+                  className="text-xs text-muted-foreground"
+                  tick={{ fontSize: 12 }}
+                  tickMargin={10}
+                  label={{
+                    value: 'Date',
+                    angle: 0,
+                    position: 'bottom',
+                    className: "text-xs text-muted-foreground"
+                  }}
                 />
-              ))}
-            </Pie>
-            <Tooltip content={<CustomTooltip />} />
-            <Legend content={<CustomLegend />} />
-          </PieChart>
-        </ResponsiveContainer>
+                <YAxis
+                  className="text-xs text-muted-foreground"
+                  domain={[-10, 10]}
+                  tickFormatter={(value) => `${value.toFixed(1)}`}
+                  label={{
+                    value: 'Mood Intensity',
+                    angle: -90,
+                    position: 'insideLeft',
+                    className: "text-xs text-muted-foreground"
+                  }}
+                />
+                <Tooltip
+                  content={({ active, payload, label }) => {
+                    if (active && payload && payload.length) {
+                      const dayData = payload[0].payload
+
+                      return (
+                        <Card className="border-none bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/85">
+                          <CardHeader className="pb-2">
+                            <CardTitle className="text-sm font-medium">
+                              {label} ({dayData.totalEntries} entries)
+                            </CardTitle>
+                          </CardHeader>
+                          <CardContent className="space-y-2">
+                            <div className="text-xs text-muted-foreground">
+                              Average Mood: {dayData.avgDayScore.toFixed(1)}
+                            </div>
+                            <div className="space-y-1">
+                              {Object.entries(moodCategories).map(([category, info]) => {
+                                const score = dayData[`${category}Score`]
+                                const count = dayData[`${category}Count`]
+                                if (count === 0) return null
+
+                                return (
+                                  <div
+                                    key={category}
+                                    className="flex items-center justify-between gap-2 text-xs"
+                                  >
+                                    <div className="flex items-center gap-1">
+                                      <div
+                                        className="h-2 w-2 rounded-full"
+                                        style={{ background: info.color }}
+                                      />
+                                      <span className="capitalize">{category}</span>
+                                    </div>
+                                    <span className="text-muted-foreground">
+                                      {score.toFixed(1)} ({count} entries)
+                                    </span>
+                                  </div>
+                                )
+                              })}
+                            </div>
+                          </CardContent>
+                        </Card>
+                      )
+                    }
+                    return null
+                  }}
+                />
+                {Object.entries(moodCategories).map(([category, info]) => (
+                  <Area
+                    key={category}
+                    type="monotone"
+                    dataKey={`${category}Score`}
+                    stroke={info.color}
+                    fill={info.color}
+                    fillOpacity={0.3}
+                    strokeWidth={2}
+                    dot={{
+                      r: 3,
+                      fill: info.color,
+                      strokeWidth: 0
+                    }}
+                    activeDot={{
+                      r: 5,
+                      strokeWidth: 0
+                    }}
+                  />
+                ))}
+              </AreaChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
       </div>
     </div>
   )

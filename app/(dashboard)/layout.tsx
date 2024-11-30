@@ -6,16 +6,21 @@ import { usePathname, useRouter } from 'next/navigation'
 import { Separator } from '@/components/ui/separator'
 import { Card } from '@/components/ui/card'
 import Breadcrumbs from '@/components/breadcrumbs'
-import { Home, BookOpen, LineChart, ChevronLeft, ChevronRight } from 'lucide-react'
+import { Home, BookOpen, LineChart, ChevronLeft, ChevronRight, Calendar } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 
 const links = [
   { href: '/home', label: 'Home', icon: Home },
   { href: '/journal', label: 'Journal', icon: BookOpen },
-  { href: '/history', label: 'History', icon: LineChart },
+  { href: '/statistics', label: 'Statistics', icon: LineChart },
+  { href: '/history', label: 'History', icon: Calendar },
 ]
 
-const DashboardLayout = ({ children }) => {
+interface DashboardLayoutProps {
+  children: React.ReactNode
+}
+
+const DashboardLayout = ({ children }: DashboardLayoutProps) => {
   const pathname = usePathname()
   const router = useRouter()
 
