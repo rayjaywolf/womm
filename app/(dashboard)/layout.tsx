@@ -2,11 +2,12 @@
 
 import { UserButton } from '@clerk/nextjs'
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import { Separator } from '@/components/ui/separator'
 import { Card } from '@/components/ui/card'
 import Breadcrumbs from '@/components/breadcrumbs'
-import { Home, BookOpen, LineChart } from 'lucide-react'
+import { Home, BookOpen, LineChart, ChevronLeft, ChevronRight } from 'lucide-react'
+import { Button } from '@/components/ui/button'
 
 const links = [
   { href: '/home', label: 'Home', icon: Home },
@@ -16,6 +17,7 @@ const links = [
 
 const DashboardLayout = ({ children }) => {
   const pathname = usePathname()
+  const router = useRouter()
 
   return (
     <div className="min-h-screen w-full relative bg-gradient-to-br from-background to-secondary/5 overflow-hidden">
@@ -56,7 +58,27 @@ const DashboardLayout = ({ children }) => {
       <div className="ml-[280px] pt-4 pr-4 min-h-screen pb-4">
         <Card className="h-[60px] border-none shadow-sm bg-card/80 backdrop-blur-xl">
           <div className="h-full w-full px-6 flex items-center justify-between">
-            <Breadcrumbs />
+            <div className="flex items-center gap-4">
+              <div className="flex items-center gap-2 mr-4">
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={() => router.back()}
+                  className="bg-background/60 hover:bg-background/80 border-border/40"
+                >
+                  <ChevronLeft className="h-4 w-4" />
+                </Button>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={() => router.forward()}
+                  className="bg-background/60 hover:bg-background/80 border-border/40"
+                >
+                  <ChevronRight className="h-4 w-4" />
+                </Button>
+              </div>
+              <Breadcrumbs />
+            </div>
             <UserButton />
           </div>
         </Card>

@@ -56,7 +56,7 @@ const JournalFilters = ({ filter, sort }: JournalFiltersProps) => {
     }
 
     return (
-        <div className="flex items-center justify-between gap-4 mb-5">
+        <div className="flex items-center justify-between gap-4 mb-6">
             <Button
                 onClick={handleNewEntry}
                 variant="outline"
