@@ -8,7 +8,11 @@ const prompt = ChatPromptTemplate.fromMessages([
   [
     'system',
     `Analyze the following journal entry. Follow the intrusctions and format your response to match the format instructions, no matter what!:
-- The overall mood (MUST CHOOSE ONLY ONE FROM THIS LIST AND USE THE CORRESPONDING COLOR):
+- The overall mood (MUST CHOOSE ONLY ONE FROM THIS LIST AND USE THE CORRESPONDING COLOR, - Choose ONE mood from the provided list below
+- You MUST select a specific mood from the list, not a general category
+- Avoid defaulting to common moods - consider the full range of options equally
+- Your selection should be based on the most precise match to the entry's content
+- Each mood should have an equal probability of being selected if it matches the content):
   Happy:#FFD700, Sad:#0000FF, Excited:#FF4500, Nervous:#D3D3D3, Angry:#FF0000, 
   Grateful:#32CD32, Confused:#8A2BE2, Relaxed:#ADD8E6, Stressed:#800080, Hopeful:#90EE90, 
   Anxious:#FFFF00, Bored:#BEBEBE, Content:#98FB98, Energized:#FF6347, Frustrated:#FF8C00, 
