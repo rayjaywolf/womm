@@ -2,9 +2,11 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { useState } from 'react'
 import { getMoodEmoji } from '@/lib/utils'
 import { useRouter } from 'next/navigation'
+import { cn } from '@/lib/utils'
 
 interface CalendarProps {
     data: {
@@ -83,6 +85,11 @@ const YearlyMoodCalendar = ({ data }: CalendarProps) => {
             const entryDate = new Date(entry.date)
             return entryDate.getFullYear() === year && entryDate.getMonth() === monthIndex
         })
+    }
+
+    const isFutureDate = (date: Date) => {
+        const today = new Date()
+        return date > today
     }
 
     return (
@@ -164,51 +171,91 @@ const YearlyMoodCalendar = ({ data }: CalendarProps) => {
                                         {Array.from({ length: getDaysInMonth(parseInt(selectedYear), monthIndex) }).map((_, i) => {
                                             const date = new Date(parseInt(selectedYear), monthIndex, i + 1)
                                             const dayData = getDataForDate(date)
+                                            const isDateInFuture = isFutureDate(date)
+                                            const isCurrentMonth = monthIndex === currentMonth && parseInt(selectedYear) === currentYear
 
                                             return (
-                                                <div
-                                                    key={i}
-                                                    className="aspect-square relative group"
-                                                    onClick={() => handleDayClick(date, !!dayData)}
-                                                >
-                                                    <div className={`
-                                                        w-full h-full rounded-sm flex items-center justify-center
-                                                        transition-colors duration-200
-                                                        ${dayData
-                                                            ? getSentimentColorClass(dayData.averageSentiment) + ' cursor-pointer'
-                                                            : 'bg-muted/5 hover:bg-muted/10'
-                                                        }
-                                                    `}>
-                                                        {dayData ? (
-                                                            <span className="text-xl sm:text-2xl">
-                                                                {getMoodEmoji(dayData.averageSentiment)}
-                                                            </span>
-                                                        ) : (
-                                                            <span className="text-muted-foreground text-sm">
-                                                                {i + 1}
-                                                            </span>
+                                                <TooltipProvider key={i}>
+                                                    <Tooltip delayDuration={0}>
+                                                        <TooltipTrigger asChild>
+                                                            <div
+                                                                className="aspect-square relative group"
+                                                                onClick={() => handleDayClick(date, !!dayData)}
+                                                            >
+                                                                <div className={`
+                                                                    w-full h-full rounded-sm flex items-center justify-center
+                                                                    transition-colors duration-200
+                                                                    ${dayData
+                                                                        ? getSentimentColorClass(dayData.averageSentiment) + ' cursor-pointer'
+                                                                        : 'bg-muted/5 hover:bg-muted/10'
+                                                                    }
+                                                                    ${isCurrentMonth && isDateInFuture ? 'opacity-30' : ''}
+                                                                `}>
+                                                                    {dayData ? (
+                                                                        <span className="text-xl sm:text-2xl">
+                                                                            {getMoodEmoji(dayData.averageSentiment)}
+                                                                        </span>
+                                                                    ) : (
+                                                                        <span className="text-muted-foreground text-sm">
+                                                                            {i + 1}
+                                                                        </span>
+                                                                    )}
+                                                                </div>
+                                                            </div>
+                                                        </TooltipTrigger>
+                                                        {dayData && (
+                                                            <TooltipContent
+                                                                side="top"
+                                                                align="center"
+                                                                className="bg-white/95 backdrop-blur-sm border-border/40 shadow-lg px-4 py-3 rounded-lg"
+                                                                sideOffset={4}
+                                                            >
+                                                                <div className="relative flex flex-col gap-2.5">
+                                                                    {/* Date header */}
+                                                                    <div className="flex items-center gap-2">
+                                                                        <div className="h-2 w-2 rounded-full"
+                                                                            style={{
+                                                                                background: dayData.averageSentiment >= 0
+                                                                                    ? 'linear-gradient(135deg, #22c55e20, #22c55e)'
+                                                                                    : 'linear-gradient(135deg, #ef444420, #ef4444)'
+                                                                            }}
+                                                                        />
+                                                                        <div className="font-medium text-sm text-zinc-900">
+                                                                            {new Date(date).toLocaleDateString('en-US', {
+                                                                                month: 'short',
+                                                                                day: 'numeric',
+                                                                                year: 'numeric'
+                                                                            })}
+                                                                        </div>
+                                                                    </div>
+
+                                                                    {/* Stats */}
+                                                                    <div className="space-y-1.5 pt-1">
+                                                                        <div className="flex items-center justify-between gap-3">
+                                                                            <span className="text-xs font-medium text-zinc-700">
+                                                                                Sentiment
+                                                                            </span>
+                                                                            <span className={cn(
+                                                                                "text-xs font-semibold",
+                                                                                dayData.averageSentiment >= 0 ? "text-green-700" : "text-red-700"
+                                                                            )}>
+                                                                                {dayData.averageSentiment.toFixed(1)}/10
+                                                                            </span>
+                                                                        </div>
+                                                                        <div className="flex items-center justify-between gap-3">
+                                                                            <span className="text-xs font-medium text-zinc-700">
+                                                                                Entries
+                                                                            </span>
+                                                                            <span className="text-xs font-semibold text-zinc-900">
+                                                                                {dayData.entriesCount}
+                                                                            </span>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </TooltipContent>
                                                         )}
-                                                    </div>
-                                                    {dayData && (
-                                                        <div className="absolute z-50 bottom-full left-1/2 -translate-x-1/2 mb-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                                                            <Card className="p-2 whitespace-nowrap">
-                                                                <div className="font-medium text-sm">
-                                                                    {new Date(date).toLocaleDateString('en-US', {
-                                                                        month: 'short',
-                                                                        day: 'numeric',
-                                                                        year: 'numeric'
-                                                                    })}
-                                                                </div>
-                                                                <div className="text-muted-foreground mt-0.5 text-xs">
-                                                                    Sentiment: {dayData.averageSentiment.toFixed(1)}/10
-                                                                </div>
-                                                                <div className="text-muted-foreground text-xs">
-                                                                    Entries: {dayData.entriesCount}
-                                                                </div>
-                                                            </Card>
-                                                        </div>
-                                                    )}
-                                                </div>
+                                                    </Tooltip>
+                                                </TooltipProvider>
                                             )
                                         })}
                                     </div>
