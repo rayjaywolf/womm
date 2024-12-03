@@ -1,3 +1,5 @@
+'use client'
+
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { cn } from '@/lib/utils'
@@ -35,7 +37,7 @@ const EntryCard = ({ entry }) => {
   const mood = entry.analysis?.mood.toUpperCase() || 'NO MOOD'
   const summary = entry.analysis?.summary
     ? entry.analysis.summary.charAt(0).toUpperCase() +
-    entry.analysis.summary.slice(1)
+      entry.analysis.summary.slice(1)
     : 'No summary yet...'
   const moodColor = entry.analysis?.color || '#94a3b8'
   const darkVariant = colorMapping[moodColor]
