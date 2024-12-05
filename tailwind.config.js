@@ -55,9 +55,72 @@ module.exports = {
   			'xs': '0 1px 2px 0 rgb(0 0 0 / 0.05)',
   			'sm': '0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1)',
   			'md': '0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)',
-  		}
+  		},
+  		typography: {
+  			DEFAULT: {
+  				css: {
+  					maxWidth: 'none',
+  					color: 'inherit',
+  					a: {
+  						color: 'inherit',
+  						textDecoration: 'none',
+  						fontWeight: '500',
+  					},
+  					'[class~="lead"]': {
+  						color: 'inherit',
+  					},
+  					strong: {
+  						color: 'inherit',
+  					},
+  					'ul > li::before': {
+  						backgroundColor: 'currentColor',
+  					},
+  					hr: {
+  						borderColor: 'currentColor',
+  						opacity: 0.3,
+  					},
+  					blockquote: {
+  						color: 'inherit',
+  						borderLeftColor: 'currentColor',
+  					},
+  					h1: {
+  						color: 'inherit',
+  					},
+  					h2: {
+  						color: 'inherit',
+  					},
+  					h3: {
+  						color: 'inherit',
+  					},
+  					h4: {
+  						color: 'inherit',
+  					},
+  					'figure figcaption': {
+  						color: 'inherit',
+  					},
+  					code: {
+  						color: 'inherit',
+  					},
+  					'a code': {
+  						color: 'inherit',
+  					},
+  					pre: {
+  						color: 'inherit',
+  						backgroundColor: 'transparent',
+  					},
+  					thead: {
+  						color: 'inherit',
+  						borderBottomColor: 'currentColor',
+  					},
+  					'tbody tr': {
+  						borderBottomColor: 'currentColor',
+  						opacity: 0.3,
+  					},
+  				},
+  			},
+  		},
   	}
   },
-  plugins: [require("tailwindcss-animate")],
+  plugins: [require("tailwindcss-animate"), require('@tailwindcss/typography')],
 }
 

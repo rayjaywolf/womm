@@ -23,6 +23,7 @@ import {
 import { toast } from "sonner"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Button } from "@/components/ui/button"
+import RichTextEditor from './RichTextEditor'
 
 const getLuminance = (color: string) => {
   const hex = color.replace('#', '')
@@ -191,11 +192,9 @@ const Editor = ({ entry }) => {
           </div>
         </CardHeader>
         <CardContent className="flex-1 p-0 overflow-hidden">
-          <Textarea
-            ref={textareaRef}
-            value={value}
-            onChange={(e) => setValue(e.target.value)}
-            className="h-full rounded-none border-0 resize-none focus-visible:ring-0 focus-visible:ring-offset-0 px-5"
+          <RichTextEditor
+            content={value}
+            onChange={setValue}
             placeholder="Write your thoughts here..."
             autoFocus
           />
