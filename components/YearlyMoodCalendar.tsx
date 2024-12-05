@@ -51,19 +51,22 @@ const YearlyMoodCalendar = ({ data }: CalendarProps) => {
     }
 
     const getDaysInMonth = (year: number, month: number) => {
-        return new Date(year, month + 1, 0).getDate()
+        return new Date(year, month + 1, 0, 12).getDate()
     }
 
     const getFirstDayOfMonth = (year: number, month: number) => {
-        return new Date(year, month, 1).getDay()
+        return new Date(year, month, 1, 12).getDay()
     }
 
     const getDataForDate = (date: Date) => {
-        return data.find(d =>
-            d.date.getFullYear() === date.getFullYear() &&
-            d.date.getMonth() === date.getMonth() &&
-            d.date.getDate() === date.getDate()
-        )
+        return data.find(d => {
+            const entryDate = new Date(d.date)
+            return (
+                entryDate.getFullYear() === date.getFullYear() &&
+                entryDate.getMonth() === date.getMonth() &&
+                entryDate.getDate() === date.getDate()
+            )
+        })
     }
 
     const handleMonthClick = (monthIndex: number) => {
@@ -89,6 +92,8 @@ const YearlyMoodCalendar = ({ data }: CalendarProps) => {
 
     const isFutureDate = (date: Date) => {
         const today = new Date()
+        today.setHours(0, 0, 0, 0)
+        date.setHours(0, 0, 0, 0)
         return date > today
     }
 
@@ -169,9 +174,9 @@ const YearlyMoodCalendar = ({ data }: CalendarProps) => {
                                             <div key={`empty-${i}`} className="aspect-square" />
                                         ))}
                                         {Array.from({ length: getDaysInMonth(parseInt(selectedYear), monthIndex) }).map((_, i) => {
-                                            const date = new Date(parseInt(selectedYear), monthIndex, i + 1)
+                                            const date = new Date(parseInt(selectedYear), monthIndex, i + 1, 12)
                                             const dayData = getDataForDate(date)
-                                            const isDateInFuture = isFutureDate(date)
+                                            const isDateInFuture = isFutureDate(new Date(date))
                                             const isCurrentMonth = monthIndex === currentMonth && parseInt(selectedYear) === currentYear
 
                                             return (

@@ -29,7 +29,7 @@ const EntryCard = ({ entry }) => {
       day: 'numeric',
       year: 'numeric',
     })
-    .replace(/,/g, '')
+    .replace(/, (\d{4})/, ' $1')
   const time = dateObj.toLocaleTimeString('en-US', {
     hour: 'numeric',
     minute: '2-digit',
@@ -37,7 +37,7 @@ const EntryCard = ({ entry }) => {
   const mood = entry.analysis?.mood.toUpperCase() || 'NO MOOD'
   const summary = entry.analysis?.summary
     ? entry.analysis.summary.charAt(0).toUpperCase() +
-      entry.analysis.summary.slice(1)
+    entry.analysis.summary.slice(1)
     : 'No summary yet...'
   const moodColor = entry.analysis?.color || '#94a3b8'
   const darkVariant = colorMapping[moodColor]

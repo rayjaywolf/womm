@@ -18,27 +18,34 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { useState, useMemo, useEffect } from 'react'
+import { useState, useMemo, useEffect, useCallback } from 'react'
 import { startOfToday, subDays, subMonths, startOfDay, startOfWeek, startOfMonth } from 'date-fns'
 
-const CustomTooltip = ({
-  payload,
-  label,
-  active,
-}: {
-  payload: any
-  label: any
-  active: any
-}) => {
-  const dateLabel = new Date(label).toLocaleString('en-us', {
-    weekday: 'long',
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
-    hour: 'numeric',
-    minute: 'numeric',
-  })
+interface AnalysisData {
+  updatedAt: string
+  sentimentScore: number
+  mood: string
+  color: string
+}
 
+interface ChartProps {
+  data: AnalysisData[]
+  avg: number
+}
+
+interface TooltipProps {
+  active?: boolean
+  payload?: Array<{
+    payload: {
+      updatedAt: string
+      mood: string
+      color: string
+    }
+  }>
+  label?: string
+}
+
+const CustomTooltip = ({ active, payload, label }: TooltipProps) => {
   if (active && payload && payload.length) {
     const analysis = payload[0].payload
     return (
@@ -53,24 +60,30 @@ const CustomTooltip = ({
           </CardTitle>
         </CardHeader>
         <CardContent className="text-xs text-muted-foreground">
-          {dateLabel}
+          {new Date(label).toLocaleString('en-us', {
+            weekday: 'long',
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric',
+            hour: 'numeric',
+            minute: 'numeric',
+          })}
         </CardContent>
       </Card>
     )
   }
-
   return null
 }
 
-const HistoryChart = ({ data, avg }) => {
+const HistoryChart = ({ data, avg }: ChartProps) => {
   const [timeFilter, setTimeFilter] = useState('all')
-  const [selectedDay, setSelectedDay] = useState(null)
+  const [selectedDay, setSelectedDay] = useState<string | null>(null)
 
-  const handleDotClick = (data) => {
+  const handleDotClick = useCallback((data: AnalysisData) => {
     if (['week', 'month'].includes(timeFilter)) {
       setSelectedDay(startOfDay(new Date(data.updatedAt)).toISOString())
     }
-  }
+  }, [timeFilter])
 
   const getXAxisTickFormatter = (value) => {
     if (selectedDay || timeFilter === 'today') {
@@ -275,6 +288,7 @@ const HistoryChart = ({ data, avg }) => {
                 const isNoEntry = props.payload.mood === 'No entries'
                 return (
                   <circle
+                    key={props.cx}
                     cx={props.cx}
                     cy={props.cy}
                     r={4}

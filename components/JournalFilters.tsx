@@ -13,9 +13,10 @@ import {
     SelectValue,
 } from "@/components/ui/select"
 import { useRouter, useSearchParams } from 'next/navigation'
-import { PenLine, Plus } from 'lucide-react'
+import { Loader2, Plus } from 'lucide-react'
 import { createNewEntry } from '@/util/api'
 import { toast } from "sonner"
+import { useState } from 'react'
 
 interface JournalFiltersProps {
     filter: string
@@ -25,14 +26,31 @@ interface JournalFiltersProps {
 const JournalFilters = ({ filter, sort }: JournalFiltersProps) => {
     const router = useRouter()
     const searchParams = useSearchParams()
+    const [isCreating, setIsCreating] = useState(false)
 
     const handleNewEntry = async () => {
-        const data = await createNewEntry()
-        router.push(`/journal/${data.id}`)
-        toast("New entry created!", {
-            description: "Your journal entry has been created successfully.",
-            duration: 3000,
-        })
+        if (isCreating) return
+
+        setIsCreating(true)
+        const loadingToast = toast.loading("Creating new entry...")
+
+        try {
+            const data = await createNewEntry()
+            router.push(`/journal/${data.id}`)
+            toast.dismiss(loadingToast)
+            toast.success("New entry created!", {
+                description: "Your journal entry has been created successfully.",
+                duration: 3000,
+            })
+        } catch (error) {
+            toast.dismiss(loadingToast)
+            toast.error("Failed to create entry", {
+                description: "Please try again.",
+                duration: 3000,
+            })
+        } finally {
+            setIsCreating(false)
+        }
     }
 
     const setFilter = (value: string) => {
@@ -61,10 +79,17 @@ const JournalFilters = ({ filter, sort }: JournalFiltersProps) => {
                 onClick={handleNewEntry}
                 variant="outline"
                 className="relative group border border-primary hover:border-primary bg-background/50 hover:bg-background/80 backdrop-blur-sm shadow-none"
+                disabled={isCreating}
             >
                 <div className="absolute inset-0 transition-all duration-300 group-hover:bg-primary/5 rounded-md" />
-                <Plus className="w-4 h-4 mr-1 transition-all duration-300 group-hover:rotate-90 text-primary group-hover:text-primary" />
-                <span className="text-primary group-hover:text-primary transition-colors duration-300">New Entry</span>
+                {isCreating ? (
+                    <Loader2 className="h-4 w-4 mr-1 animate-spin text-primary" />
+                ) : (
+                    <Plus className="w-4 h-4 mr-1 transition-all duration-300 group-hover:rotate-90 text-primary group-hover:text-primary" />
+                )}
+                <span className="text-primary group-hover:text-primary transition-colors duration-300">
+                    {isCreating ? 'Creating...' : 'New Entry'}
+                </span>
             </Button>
 
             <div className="flex items-center gap-5">
