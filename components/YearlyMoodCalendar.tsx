@@ -17,10 +17,26 @@ interface CalendarProps {
 }
 
 const getSentimentColorClass = (score: number) => {
-    if (score >= 5) return 'bg-green-100/80 hover:bg-green-200/90'
-    if (score >= 0) return 'bg-green-50/80 hover:bg-green-100/90'
-    if (score >= -5) return 'bg-orange-50/80 hover:bg-orange-100/90'
-    return 'bg-red-100/80 hover:bg-red-200/90'
+    // Negative scores (-10 to 0)
+    if (score <= -9) return 'bg-[#b71c1c]/30 hover:bg-[#c62828]/80'
+    if (score <= -7) return 'bg-[#c62828]/30 hover:bg-[#d32f2f]/80'
+    if (score <= -5) return 'bg-[#d32f2f]/30 hover:bg-[#e53935]/80'
+    if (score <= -3) return 'bg-[#e53935]/30 hover:bg-[#f44336]/80'
+    if (score < 0) return 'bg-[#f44336]/30 hover:bg-[#ef5350]/80'
+
+    // Neutral to slightly positive (0 to 5)
+    if (score === 0) return 'bg-[#ff6f00]/30 hover:bg-[#ff8f00]/80'
+    if (score <= 1) return 'bg-[#ff8f00]/30 hover:bg-[#ffa000]/80'
+    if (score <= 2) return 'bg-[#ffa000]/30 hover:bg-[#ffb300]/80'
+    if (score <= 3) return 'bg-[#ffb300]/30 hover:bg-[#ffc107]/80'
+    if (score <= 5) return 'bg-[#ffc107]/30 hover:bg-[#ffb300]/80'
+
+    // Very positive scores (6 to 10)
+    if (score <= 6) return 'bg-[#1b5e20]/30 hover:bg-[#2e7d32]/80'
+    if (score <= 7) return 'bg-[#2e7d32]/30 hover:bg-[#388e3c]/80'
+    if (score <= 8) return 'bg-[#388e3c]/30 hover:bg-[#43a047]/80'
+    if (score <= 9) return 'bg-[#43a047]/30 hover:bg-[#4caf50]/80'
+    return 'bg-[#4caf50]/30 hover:bg-[#43a047]/80'
 }
 
 const YearlyMoodCalendar = ({ data }: CalendarProps) => {
@@ -51,22 +67,19 @@ const YearlyMoodCalendar = ({ data }: CalendarProps) => {
     }
 
     const getDaysInMonth = (year: number, month: number) => {
-        return new Date(year, month + 1, 0, 12).getDate()
+        return new Date(year, month + 1, 0).getDate()
     }
 
     const getFirstDayOfMonth = (year: number, month: number) => {
-        return new Date(year, month, 1, 12).getDay()
+        return new Date(year, month, 1).getDay()
     }
 
     const getDataForDate = (date: Date) => {
-        return data.find(d => {
-            const entryDate = new Date(d.date)
-            return (
-                entryDate.getFullYear() === date.getFullYear() &&
-                entryDate.getMonth() === date.getMonth() &&
-                entryDate.getDate() === date.getDate()
-            )
-        })
+        return data.find(d =>
+            d.date.getFullYear() === date.getFullYear() &&
+            d.date.getMonth() === date.getMonth() &&
+            d.date.getDate() === date.getDate()
+        )
     }
 
     const handleMonthClick = (monthIndex: number) => {
@@ -92,8 +105,6 @@ const YearlyMoodCalendar = ({ data }: CalendarProps) => {
 
     const isFutureDate = (date: Date) => {
         const today = new Date()
-        today.setHours(0, 0, 0, 0)
-        date.setHours(0, 0, 0, 0)
         return date > today
     }
 
@@ -174,9 +185,9 @@ const YearlyMoodCalendar = ({ data }: CalendarProps) => {
                                             <div key={`empty-${i}`} className="aspect-square" />
                                         ))}
                                         {Array.from({ length: getDaysInMonth(parseInt(selectedYear), monthIndex) }).map((_, i) => {
-                                            const date = new Date(parseInt(selectedYear), monthIndex, i + 1, 12)
+                                            const date = new Date(parseInt(selectedYear), monthIndex, i + 1)
                                             const dayData = getDataForDate(date)
-                                            const isDateInFuture = isFutureDate(new Date(date))
+                                            const isDateInFuture = isFutureDate(date)
                                             const isCurrentMonth = monthIndex === currentMonth && parseInt(selectedYear) === currentYear
 
                                             return (
