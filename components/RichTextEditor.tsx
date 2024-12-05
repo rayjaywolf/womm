@@ -52,6 +52,11 @@ const RichTextEditor = ({ content, onChange, placeholder = 'Write your thoughts 
             onChange(editor.getHTML())
         },
         autofocus: autoFocus,
+        onCreate: ({ editor }) => {
+            if (content) {
+                editor.commands.focus('end')
+            }
+        },
     })
 
     if (!editor) return null
