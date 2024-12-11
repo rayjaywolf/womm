@@ -14,12 +14,29 @@ import {
 import { getMoodEmoji } from '@/lib/utils'
 
 const AnalyticsDashboard = ({ entries }) => {
-  const moodData = entries.map(entry => ({
-    date: new Date(entry.createdAt).toLocaleDateString(),
-    score: entry.analysis?.sentimentScore || 0,
-    color: entry.analysis?.color || '#94a3b8',
-    mood: entry.analysis?.mood || 'NEUTRAL'
-  }))
+  const moodData = entries.reduce((acc, entry) => {
+    const date = new Date(entry.createdAt).toLocaleDateString()
+    if (!acc[date]) {
+      acc[date] = {
+        date,
+        entries: [],
+        totalScore: 0,
+        count: 0
+      }
+    }
+    acc[date].entries.push(entry)
+    acc[date].totalScore += (entry.analysis?.sentimentScore || 0)
+    acc[date].count += 1
+    return acc
+  }, {})
+
+  const chartData = Object.values(moodData).map(day => ({
+    date: day.date,
+    score: Math.round((day.totalScore / day.count) * 10) / 10,
+    color: day.entries[0].analysis?.color || '#94a3b8',
+    mood: day.entries[0].analysis?.mood || 'NEUTRAL',
+    entriesCount: day.count
+  })).sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
 
   const totalEntries = entries.length
   const averageSentiment = Math.round(
@@ -65,33 +82,47 @@ const AnalyticsDashboard = ({ entries }) => {
         <CardHeader className="flex flex-row items-center justify-between space-y-0">
           <CardTitle className="text-lg font-medium tracking-tight">Mood Trend</CardTitle>
           <Badge variant="secondary" className="text-xs font-medium">
-            Last {entries.length} entries
+            Last {chartData.length} days
           </Badge>
         </CardHeader>
         <CardContent>
           <div className="h-[300px] w-full">
             <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={moodData}>
+              <LineChart data={chartData}>
                 <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
                 <XAxis
                   dataKey="date"
                   className="text-xs text-muted-foreground"
                   dy={15}
+                  interval="preserveStartEnd"
+                  tickFormatter={(value) => new Date(value).toLocaleDateString('en-US', {
+                    month: 'short',
+                    day: 'numeric'
+                  })}
                 />
                 <YAxis
                   domain={[-10, 10]}
                   className="text-xs text-muted-foreground"
                   dx={-15}
+                  tickFormatter={(value) => `${value}`}
                 />
                 <Tooltip content={<CustomTooltip />} />
                 <Line
                   type="monotone"
                   dataKey="score"
                   strokeWidth={2}
-                  dot={{
-                    r: 4,
-                    fill: 'hsl(var(--primary))',
-                    strokeWidth: 0
+                  dot={(props) => {
+                    const count = props.payload.entriesCount
+                    return (
+                      <circle
+                        cx={props.cx}
+                        cy={props.cy}
+                        r={count > 1 ? 5 : 4}
+                        fill="hsl(var(--primary))"
+                        strokeWidth={count > 1 ? 2 : 0}
+                        stroke="hsl(var(--background))"
+                      />
+                    )
                   }}
                   activeDot={{
                     r: 6,
@@ -122,8 +153,23 @@ const CustomTooltip = ({ active, payload, label }) => {
             {data.mood.toUpperCase()}
           </CardTitle>
         </CardHeader>
-        <CardContent className="text-xs text-muted-foreground">
-          {label}
+        <CardContent className="space-y-1">
+          <p className="text-xs text-muted-foreground">
+            {new Date(label).toLocaleDateString('en-US', {
+              weekday: 'long',
+              year: 'numeric',
+              month: 'long',
+              day: 'numeric'
+            })}
+          </p>
+          <div className="flex items-center justify-between gap-2">
+            <span className="text-xs text-muted-foreground">Score:</span>
+            <span className="text-xs font-medium">{data.score}</span>
+          </div>
+          <div className="flex items-center justify-between gap-2">
+            <span className="text-xs text-muted-foreground">Entries:</span>
+            <span className="text-xs font-medium">{data.entriesCount}</span>
+          </div>
         </CardContent>
       </Card>
     )

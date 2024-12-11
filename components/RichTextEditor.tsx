@@ -45,7 +45,7 @@ const RichTextEditor = ({ content, onChange, placeholder = 'Write your thoughts 
         content,
         editorProps: {
             attributes: {
-                class: 'prose prose-neutral dark:prose-invert max-w-none focus:outline-none h-full px-5 py-4',
+                class: 'prose prose-neutral dark:prose-invert max-w-none focus:outline-none min-h-full px-5 py-4',
             },
         },
         onUpdate: ({ editor }) => {
@@ -62,7 +62,7 @@ const RichTextEditor = ({ content, onChange, placeholder = 'Write your thoughts 
     if (!editor) return null
 
     return (
-        <div className="relative h-full w-full">
+        <div className="relative flex flex-col h-full w-full overflow-hidden">
             {editor && (
                 <BubbleMenu
                     editor={editor}
@@ -133,7 +133,10 @@ const RichTextEditor = ({ content, onChange, placeholder = 'Write your thoughts 
                     </Toggle>
                 </BubbleMenu>
             )}
-            <EditorContent editor={editor} className="h-full" />
+            <EditorContent
+                editor={editor}
+                className="flex-1 overflow-y-auto"
+            />
         </div>
     )
 }
