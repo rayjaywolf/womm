@@ -1,4 +1,5 @@
 import { ChatGroq } from '@langchain/groq'
+import { ChatGoogleGenerativeAI } from "@langchain/google-genai";
 import { ChatPromptTemplate } from '@langchain/core/prompts'
 import { JsonOutputParser } from '@langchain/core/output_parsers'
 import z from 'zod'
@@ -39,7 +40,7 @@ Return your analysis as a JSON object with the following structure:
   "mood": "MUST choose only one mood from the provided list above",
   "subject": "the subject of the journal entry.",
   "negative": boolean "is the journal entry negative? (i.e. does it contain negative emotions?).",
-  "summary": "quick summary of the entire entry.",
+  "summary": "quick summary of the entire entry (the summary should not be too long, one paragraph max, but should be descriptive enough to give a good idea of the content).",
   "color": "MUST use the exact hex color that corresponds to the chosen mood from the list above",
   "sentimentScore": number "sentiment of the text rated on a scale from -10 to 10, where -10 is extremely negative, 0 is neutral, and 10 is extremely positive."
 }}`,
@@ -48,8 +49,8 @@ Return your analysis as a JSON object with the following structure:
 ])
 
 export const analyze = async (content: string) => {
-  const model = new ChatGroq({
-    model: 'gemma2-9b-it',
+  const model = new ChatGoogleGenerativeAI({
+    model: 'gemini-2.0-flash-exp',
     temperature: 0,
   })
 
