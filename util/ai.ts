@@ -49,7 +49,7 @@ Return your analysis as a JSON object with the following structure:
 
 export const analyze = async (content: string) => {
   const model = new ChatGroq({
-    model: 'gemma2-9b-it',
+    model: 'deepseek-r1-distill-llama-70b',
     temperature: 0,
   })
 
